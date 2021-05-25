@@ -52,6 +52,14 @@ class Library(Resource):
             abort(404, message="name of book not found")
         return result
 
+    def delete(self, name):
+        search = LibraryModel.query.filter_by(name=name).first()
+        if not search:
+            abort(404, message="name of book not found")
+        else:
+            LibraryModel.query.filter_by(name=name).delete()
+            db.session.commit()
+        return '', 204
 api.add_resource(Library, "/library/<string:name>")
 if __name__ == '__main__':
     app.run(debug=True)
