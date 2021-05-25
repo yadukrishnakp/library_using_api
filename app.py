@@ -18,12 +18,17 @@ class LibraryModel(db.Model):
         return f"Library(name = {name}, author ={author},stocks={stocks},price={price})"
 
 
-db.create_all()
 library_args = reqparse.RequestParser()
 library_args.add_argument("name", type=str, help="name of the book", required=True)
 library_args.add_argument("author", type=str, help="name of the author", required=True)
 library_args.add_argument("stocks", type=int, help="number of stock of book", required=True)
 library_args.add_argument("price", type=int, help="price of the book", required=True)
+
+library_update_args = reqparse.RequestParser()
+library_update_args.add_argument("name", type=str, help="name of the book")
+library_update_args.add_argument("author", type=str, help="name of the author")
+library_update_args.add_argument("stocks", type=int, help="number of stock of book")
+library_update_args.add_argument("price", type=int, help="price of the book")
 
 resource_fields = {
     'name': fields.String,
@@ -60,6 +65,26 @@ class Library(Resource):
             LibraryModel.query.filter_by(name=name).delete()
             db.session.commit()
         return '', 204
+
+    @marshal_with(resource_fields)
+    def patch(self, name):
+        search = LibraryModel.query.filter_by(name=name).first()
+        if not search:
+            abort(404, message="name of book not found")
+        args = library_update_args.parse_args()
+        search = LibraryModel.query.filter_by(name=name).first()
+        if args["name"]:
+            search.name = args["name"]
+        if args["author"]:
+            search.author = args["author"]
+        if args["stocks"]:
+            search.stocks = args["stocks"]
+        if args["price"]:
+            search.price = args["price"]
+        db.session.commit()
+        return search, 200
+
+
 api.add_resource(Library, "/library/<string:name>")
 if __name__ == '__main__':
     app.run(debug=True)
