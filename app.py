@@ -45,6 +45,12 @@ class Library(Resource):
         db.session.commit()
         return result, 201
 
+    @marshal_with(resource_fields)
+    def get(self, name):
+        search = LibraryModel.query.filter_by(name=name).first()
+        if not search:
+            abort(404, message="name of book not found")
+        return result
 
 api.add_resource(Library, "/library/<string:name>")
 if __name__ == '__main__':
