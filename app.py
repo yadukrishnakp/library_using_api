@@ -38,6 +38,7 @@ resource_fields = {
 }
 
 
+# add new book details
 class Library(Resource):
     @marshal_with(resource_fields)
     def put(self, name):
@@ -50,6 +51,7 @@ class Library(Resource):
         db.session.commit()
         return result, 201
 
+# selecting one book for seeing
     @marshal_with(resource_fields)
     def get(self, name):
         search = LibraryModel.query.filter_by(name=name).first()
@@ -57,6 +59,7 @@ class Library(Resource):
             abort(404, message="name of book not found")
         return result
 
+# delete books
     def delete(self, name):
         search = LibraryModel.query.filter_by(name=name).first()
         if not search:
@@ -66,6 +69,7 @@ class Library(Resource):
             db.session.commit()
         return '', 204
 
+# update details of books
     @marshal_with(resource_fields)
     def patch(self, name):
         search = LibraryModel.query.filter_by(name=name).first()
